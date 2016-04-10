@@ -10,17 +10,32 @@ public class Heuristic {
 	private static int num_row_holes = 0;
 	private static int[] colWithHoles = new int[10];
 	private static int[] rowWithHoles = new int[21];
+	private static int[] colHeights = new int[10];
 	
 
 	public static double heuristicValue(State s, int moveIndex) {
-		int[] move = s.legalMoves()[moveIndex];
+		int[][] moves = s.legalMovesForIndex(moveIndex);
+		for (int[] move : moves) {
+			int[][] futureField = s.getFutureFieldForMove(move);
+			int rowsCleared = s.getRowsClearedForMove(move);
+			searchHoles(futureField);
+			int firstCol = move[1];
+			int length = s.pWidth[moveIndex][move[0]];
+			getLandingHeight(futureField, firstCol, length, rowsCleared);
+			
+		}
 		return 0;		
 	}
 
 
 
-	private static double getLandingHeight() {
-		
+	private static double getLandingHeight(int[][] futureFields, int firstCol, int length, int rowsCleared) {
+		int height = 0;
+		for(int i = firstCol; i < firstCol + length; i++) {
+			height = Math.max(height, colHeights[i]);
+		}
+		height -= rowsCleared;
+		return height;
 	}
 
 	private static double getRowsTransition(int[][] futureFields) {
@@ -43,6 +58,9 @@ public class Heuristic {
 				if (futureFields[i][j] != 0) {
 					if (max_column_height < i) {
 						max_column_height = i;
+					}
+					if (!flag) {
+						colHeights[j] = i;
 					}
 					flag = true;
 				}
