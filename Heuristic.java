@@ -2,8 +2,10 @@ public class Heuristic {
 
 	/* heuristic function, given a state and one (potential) move, 
 	return the weighted heurtisticValue combining each feature */
-	public static double heuristicValue(State s, int[] move) {
-//		s.getFutureFieldForMove(move);
+
+	public static double heuristicValue(State s, int moveIndex) {
+		//	s.getFutureFieldForMove(move);
+		int[] move = s.legalMoves()[moveIndex];
 		return 0;		
 	}
 
