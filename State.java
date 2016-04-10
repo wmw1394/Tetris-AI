@@ -314,15 +314,7 @@ public class State {
 					while(virtualTop[c]>=1 && futureField[virtualTop[c]-1][c]==0)	virtualTop[c]--;
 				}
 			}
-	}
-		//for testing purpose
-		for(int i = 0; i < ROWS; i++) {
-			for(int j = 0; j < COLS; j++) {
-				System.out.print(futureField[i][j]);
-			}
-			System.out.println();
 		}
-		System.out.println();
 	}
 	
 	public boolean getFutureLoss(int[] move) {
@@ -330,7 +322,7 @@ public class State {
 			virtualMove = move;
 			virtualRun(move);
 		} 
-			return virtualLost;
+		return virtualLost;
 	}
 	
 	public int[][] getFutureFieldForMove(int[] move) {

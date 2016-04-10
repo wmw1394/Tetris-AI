@@ -18,7 +18,7 @@ public class PlayerSkeleton {
 
 	//implement this function to have a working system
 	private int pickMove(State s, int[][] legalMoves) {
-		double maxHValue = 0;
+		double maxHValue = Double.NEGATIVE_INFINITY;
 		int moveWithMaxHValue = 0;
 		for (int i = 0; i < legalMoves.length; i++) {
 			double hvalue = Heuristic.heuristicValue(s, i);

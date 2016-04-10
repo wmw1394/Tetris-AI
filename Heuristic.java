@@ -2,23 +2,23 @@ import java.util.stream.IntStream;
 
 public class Heuristic {
 
-	private static final double WEIGHT_ELIMATED_ROWS = 1;
-	private static final double WEIGHT_LANDING_HEIGHT = 1;
-	private static final double WEIGHT_ROWS_TRANSITION = 1;
-	private static final double WEIGHT_COLUMN_TRANSITION = 1;
-	private static final double WEIGHT_NUMBER_HOLES = 1;
-	private static final double WEIGHT_WELL_SUM = 1;
+	private static final double WEIGHT_ELIMATED_ROWS = 8;
+	private static final double WEIGHT_LANDING_HEIGHT = -1;
+	private static final double WEIGHT_ROWS_TRANSITION = 0;
+	private static final double WEIGHT_COLUMN_TRANSITION = 0;
+	private static final double WEIGHT_NUMBER_HOLES = -2;
+	private static final double WEIGHT_WELL_SUM = 0;
 	private static final double WEIGHT_ROUGHNESS = 1;
-	private static final double WEIGHT_AGGREGATE_HEIGHT = 1;
-	private static final double WEIGHT_MAX_HOLE_HEIGHT = 1;
-	private static final double WEIGHT_MAX_COLUMN_HEIGHT = 1;
-	private static final double WEIGHT_COLUMNS_WITH_HOLES = 1;
-	private static final double WEIGHT_ROWS_WITH_HOLES = 1;
-	private static final double WEIGHT_LOWEST_PLAYABLE_ROW = 1;
-	private static final double WEIGHT_MAX_PIT_DEPTH = 1;
+	private static final double WEIGHT_AGGREGATE_HEIGHT = -1;
+	private static final double WEIGHT_MAX_HOLE_HEIGHT = -3;
+	private static final double WEIGHT_MAX_COLUMN_HEIGHT = -1;
+	private static final double WEIGHT_COLUMNS_WITH_HOLES = -1;
+	private static final double WEIGHT_ROWS_WITH_HOLES = -1;
+	private static final double WEIGHT_LOWEST_PLAYABLE_ROW = 0;
+	private static final double WEIGHT_MAX_PIT_DEPTH = -1;
 	private static final double WEIGHT_SLOPE = 1;
 	private static final double WEIGHT_CONCAVITY = 1;
-	private static final double WEIGHT_BLOCKADES = 1;
+	private static final double WEIGHT_BLOCKADES = -3;
 	private static double maxHoleHeight;
 	private static double maxColumnHeight;
 	private static double columnsWithHoles;
@@ -72,8 +72,6 @@ public class Heuristic {
 		value += concavity * WEIGHT_CONCAVITY;
 		value += blockades * WEIGHT_BLOCKADES;
 
-		System.out.println(value);
-
 		return value;
 	}
 
@@ -126,9 +124,6 @@ public class Heuristic {
 		for(int i = firstCol; i < firstCol + length; i++) {
 			if(height < heights[i]) {
 				height = heights[i];
-				System.out.println("column_height:"+heights[i]);
-				System.out.println("i:"+i);
-
 			}
 		}
 		height -= rowsCleared;
@@ -230,7 +225,6 @@ public class Heuristic {
 								maxColumnHeight = i+1;
 							}
 							if (!flag) {
-								System.out.println("max_column_height:"+i);
 								flag = true;
 							}
 						}
