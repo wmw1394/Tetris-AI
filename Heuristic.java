@@ -15,6 +15,23 @@ public class Heuristic {
 
 	// }
 
+	private static double getMaximumPitDepth(int[][] futureFields) {
+		int deepestPit = 0;
+		int[] heights = getHeights(futureFields);
+
+		for (int j = 1; j <= 8; j++) {
+			int temp = Math.min(heights[j-1] - heights[j], heights[j+1] - heights[j]);
+
+			if (temp > 0) {
+				if (temp > deepestPit) {
+					deepestPit = temp;
+				}
+			}
+		}
+
+		return deepestPit;
+	}
+
 	private static double getRowsTransition(int[][] futureFields) {
 		int rowsTransition = 0;
 
@@ -183,10 +200,31 @@ public class Heuristic {
 		return aggregateHeight;
 	}
 
-	// public static int getLowestPlayableRow(int[][] futureFields) {
+	public static int getLowestPlayableRow(int[][] futureFields) {
+		int[][] fieldCopy = new int[21][10];
 
-	// }
+		for (int i = 0; i < 21; i++) {
+			for (int j = 0; j < 10; j++) {
+				fieldCopy[i][j] = futureFields[i][j];
+			}
+		}
 
+		for (int j = 0; j < 10; j++) {
+			if (fieldCopy[20][j] == 0) {
+				traverse(fieldCopy, 20, j);
+			} 
+		}
+
+		for (int i = 0; i < 21; i++) {
+			for (int j = 0; j < 10; j++) {
+				if (fieldCopy[i][j] == -1) {
+					return i;
+				}
+			}
+		}
+
+		return 20;
+	}
 
 	public static int getBlockades(int[][] futureFields) {
 		int[] heights = getHeights(futureFields);
@@ -231,24 +269,9 @@ public class Heuristic {
 		return 0;
 	}
 
-	// public static void main(String[] args) {
-	// 	int[][] field = new int[21][10];
+	public static void main(String[] args) {
 
-	// 	for (int i = 10; i >= 0; i--) {
-	// 		for (int j = 0; j < 10; j++) {
-	// 			field[i][j] = 1;
-	// 		}
-	// 	}
-
-	// 	field[5][3] = 0;
-	// 	field[5][4] = 0;
-
-	// 	field[6][7] = 0;
-	// 	field[7][7] = 0;
-		
-
-	// 	System.out.println(getWellSums(field));
-	// }
+	}
 
 
 }
