@@ -1,6 +1,16 @@
+import java.util.stream.IntStream;
+
 public class Heuristic {
 	/* heuristic function, given a state and one (potential) move, 
 	return the weighted heurtisticValue combining each feature */
+	private static int num_holes = 0;
+	private static int max_height_holes = 0;
+	private static int max_column_height = 0;
+	private static int num_column_holes = 0;
+	private static int num_row_holes = 0;
+	private static int[] colWithHoles = new int[10];
+	private static int[] rowWithHoles = new int[21];
+	
 
 	public static double heuristicValue(State s, int moveIndex) {
 		int[] move = s.legalMoves()[moveIndex];
@@ -16,26 +26,47 @@ public class Heuristic {
 	private static double getRowsTransition(int[][] futureFields) {
 		
 	}
-
-	private static double getNumberOfHoles(int[][] futureFields) {
-		int num_holes = 0;
-
+	
+	//just use search holes
+	private static void searchHoles(int[][] futureFields) {
+		 num_holes = 0;
+		 max_height_holes = 0;
+		 max_column_height = 0;
+		 num_column_holes = 0;
+		 num_row_holes = 0;
+		 colWithHoles = new int[10];
+		 rowWithHoles = new int[21];
+		
 		for (int j = 0; j < 10; j++) {
 			boolean flag = false;
 			for (int i = 20; i >= 1; i--) {
-				if (futureFields[i][j] != 0 && !flag) {
+				if (futureFields[i][j] != 0) {
+					if (max_column_height < i) {
+						max_column_height = i;
+					}
 					flag = true;
 				}
 
 				if (flag == true) {
 					if (futureFields[i][j] == 0) {
+						if (max_height_holes < i) {
+							max_height_holes = i;
+						}
 						num_holes++;
+						colWithHoles[j] = 1;
+						rowWithHoles[i] = 1;
 					}
 				}
 			}
 		}
+		num_row_holes = IntStream.of(rowWithHoles).sum();
+		num_column_holes = IntStream.of(colWithHoles).sum();
 	}
 
+//	private static double getNumberOfHoles(int[][] futureFields) {
+//		return num_holes;
+//	}
+	
 	public static double getWellSums(int[][] futureFields) {
 		int[][] fieldCopy = new int[21][10];
 		int wellsum = 0;
