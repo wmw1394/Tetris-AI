@@ -1,21 +1,74 @@
 public class Heuristic {
 	/* heuristic function, given a state and one (potential) move, 
 	return the weighted heurtisticValue combining each feature */
+	static int[] heights;
 
-	public static double heuristicValue(State s, int moveIndex) {
-		int[] move = s.legalMoves()[moveIndex];
-		return 0;		
-	}
+	// public static double heuristicValue(State s, int moveIndex) {
+	// 	int[] move = s.legalMoves()[moveIndex];
+	// 	int[][] futureFields = s.getFutureFieldForMove(move);
+	// 	return 0;		
+	// }
 
 
 
-	private static double getLandingHeight() {
-		
-	}
+	// private static double getLandingHeight() {
+
+	// }
 
 	private static double getRowsTransition(int[][] futureFields) {
-		
+		int rowsTransition = 0;
+
+		for (int i = 21; i >= 0; i--) {
+			for (int j = 1; j < 10; j++) {
+				if (futureFields[i][j] != futureFields[i][j-1]) {
+					rowsTransition++;
+				}
+			}
+		}
+
+		return rowsTransition;
 	}
+
+	private static double getColumnsTransition(int[][] futureFields) {
+		int columnsTransition = 0;
+
+		for (int j = 0; j < 10; j++) {
+			for (int i = 21; i > 0; i--) {
+				if (futureFields[i][j] != futureFields[i-1][j]) {
+					columnsTransition++;
+				}
+			}
+		}
+
+		return columnsTransition;
+	}
+
+	private static double getSlope(int[][] futureFields) {
+		int[] heights = getHeights(futureFields);
+		int slope = 0;
+
+		for (int j = 1; j < 10; j++) {
+			slope += heights[j] - heights[j-1];
+		}
+		
+		return slope;
+	}
+
+	private static double getConcavity(int[][] futureFields) {
+		int concavity = 0;
+		int[] heights = getHeights(futureFields);
+
+		for (int j = 0; j <= 3; j++) {
+			concavity += heights[4] - heights[j];
+		}
+
+		for (int j = 6; j < 10; j++) {
+			concavity += heights[5] - heights[j];
+		}
+
+		return concavity;
+	}
+
 
 	private static double getNumberOfHoles(int[][] futureFields) {
 		int num_holes = 0;
@@ -34,6 +87,8 @@ public class Heuristic {
 				}
 			}
 		}
+
+		return num_holes;
 	}
 
 	public static double getWellSums(int[][] futureFields) {
@@ -90,10 +145,63 @@ public class Heuristic {
 		}
 	}
 
-	public static double getRoughness(int[][] futureFields) {
-
+	private static void calculateHeights(int[][] futureFields) {
+		for (int j = 0; j < 10; j++) {
+			boolean flag = true;
+			for (int i = 20; j >= 0 && flag; i--) {
+				if (futureFields[i][j] != 0) {
+					heights[j] = i + 1;
+					flag = false;
+				}
+			}
+		}
 	}
 
+	private static int[] getHeights(int[][] futureFields) {
+		return heights;
+	}
+
+	public static int getRoughness(int[][] futureFields) {
+		int[] heights = getHeights(futureFields);
+		int roughness = 0;
+
+		for (int j = 1; j < 10; j++) {
+			roughness += Math.abs(heights[j] - heights[j-1]);
+		}
+		
+		return roughness;
+	}
+
+	public static int getAggregateHeight(int[][] futureFields) {
+		int[] heights = getHeights(futureFields);
+		int aggregateHeight = 0;
+
+		for (int j = 0; j < 10; j++) {
+			aggregateHeight += heights[j];
+		}
+		
+		return aggregateHeight;
+	}
+
+	// public static int getLowestPlayableRow(int[][] futureFields) {
+
+	// }
+
+
+	public static int getBlockades(int[][] futureFields) {
+		int[] heights = getHeights(futureFields);
+		int blockades = 0;
+
+		for (int j = 0; j < 10; j++) {
+			for (int i = heights[j]; i > 0; i--) {
+				if (futureFields[i][j] != 0 && futureFields[i - 1][j] == 0) {
+					blockades += 1;
+				}
+			}
+		}
+
+		return blockades;
+	}
 
 
 	// gonna to decide the weights for each feature and set them as constant values
