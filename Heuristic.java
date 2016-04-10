@@ -11,19 +11,24 @@ public class Heuristic {
 	private static int[] colWithHoles = new int[10];
 	private static int[] rowWithHoles = new int[21];
 	private static int[] colHeights = new int[10];
-	
+
 
 	public static double heuristicValue(State s, int moveIndex) {
-		int[][] moves = s.legalMovesForIndex(moveIndex);
-		for (int[] move : moves) {
-			int[][] futureField = s.getFutureFieldForMove(move);
-			int rowsCleared = s.getRowsClearedForMove(move);
-			searchHoles(futureField);
-			int firstCol = move[1];
-			int length = s.pWidth[moveIndex][move[0]];
-			getLandingHeight(futureField, firstCol, length, rowsCleared);
-			
-		}
+		int[] move = s.legalMoves()[moveIndex];
+		int[][] futureField = s.getFutureFieldForMove(move);
+		int rowsCleared = s.getRowsClearedForMove(move);
+		searchHoles(futureField);
+		int firstCol = move[1];
+		int length = State.pWidth[s.getNextPiece()][move[0]];
+
+		int landingHeight = (int) getLandingHeight(futureField, firstCol, length, rowsCleared);
+		System.out.println("num_holes:"+num_holes);
+		System.out.println(max_height_holes);
+		System.out.println(max_column_height);
+		System.out.println(num_column_holes);
+		System.out.println(num_row_holes);
+		System.out.println(colHeights);
+		System.out.println(landingHeight);
 		return 0;		
 	}
 
@@ -32,14 +37,69 @@ public class Heuristic {
 	private static double getLandingHeight(int[][] futureFields, int firstCol, int length, int rowsCleared) {
 		int height = 0;
 		for(int i = firstCol; i < firstCol + length; i++) {
-			height = Math.max(height, colHeights[i]);
+			if(height < colHeights[i]) {
+				height = colHeights[i];
+				System.out.println("column_height:"+colHeights[i]);
+				System.out.println("i:"+i);
+
+			}
 		}
+		System.out.println("height"+height);
+		System.out.println(rowsCleared);
 		height -= rowsCleared;
 		return height;
 	}
 
 	private static double getRowsTransition(int[][] futureFields) {
+		int rowsTransition = 0;
+
+		for (int i = 21; i >= 0; i--) {
+			for (int j = 1; j < 10; j++) {
+				if (futureFields[i][j] != futureFields[i][j-1]) {
+					rowsTransition++;
+				}
+			}
+		}
+		return rowsTransition;
+	}
+
+	private static double getColumnsTransition(int[][] futureFields) {
+		int columnsTransition = 0;
+
+		for (int j = 0; j < 10; j++) {
+			for (int i = 21; i > 0; i--) {
+				if (futureFields[i][j] != futureFields[i-1][j]) {
+					columnsTransition++;
+				}
+			}
+		}
+		return columnsTransition;
+	}
+
+	private static double getSlope(int[][] futureFields) {
+		int[] heights = getHeights(futureFields);
+		int slope = 0;
+
+		for (int j = 1; j < 10; j++) {
+			slope += heights[j] - heights[j-1];
+		}
 		
+		return slope;
+	}
+
+	private static double getConcavity(int[][] futureFields) {
+		int concavity = 0;
+		int[] heights = getHeights(futureFields);
+
+		for (int j = 0; j <= 3; j++) {
+			concavity += heights[4] - heights[j];
+		}
+
+		for (int j = 6; j < 10; j++) {
+			concavity += heights[5] - heights[j];
+		}
+
+		return concavity;
 	}
 	
 	//just use search holes
@@ -51,39 +111,41 @@ public class Heuristic {
 		 num_row_holes = 0;
 		 colWithHoles = new int[10];
 		 rowWithHoles = new int[21];
-		
-		for (int j = 0; j < 10; j++) {
-			boolean flag = false;
-			for (int i = 20; i >= 1; i--) {
-				if (futureFields[i][j] != 0) {
-					if (max_column_height < i) {
-						max_column_height = i;
-					}
-					if (!flag) {
-						colHeights[j] = i;
-					}
-					flag = true;
-				}
 
-				if (flag == true) {
-					if (futureFields[i][j] == 0) {
-						if (max_height_holes < i) {
-							max_height_holes = i;
+		 for (int j = 0; j < 10; j++) {
+				boolean flag = false;
+				for (int i = 20; i >= 1; i--) {
+					if (futureFields[i][j] != 0) {
+						if (max_column_height < i+1) {
+							max_column_height = i+1;
 						}
-						num_holes++;
-						colWithHoles[j] = 1;
-						rowWithHoles[i] = 1;
+						if (!flag) {
+							System.out.println("max_column_height:"+i);
+							colHeights[j] = i+1;
+							flag = true;
+						}
+					}
+
+					if (flag == true) {
+						if (futureFields[i][j] == 0) {
+							if (max_height_holes < i) {
+								max_height_holes = i;
+							}
+							num_holes++;
+							colWithHoles[j] = 1;
+							rowWithHoles[i] = 1;
+						}
 					}
 				}
 			}
-		}
-		num_row_holes = IntStream.of(rowWithHoles).sum();
-		num_column_holes = IntStream.of(colWithHoles).sum();
+			num_row_holes = IntStream.of(rowWithHoles).sum();
+			num_column_holes = IntStream.of(colWithHoles).sum();
 	}
 
-//	private static double getNumberOfHoles(int[][] futureFields) {
-//		return num_holes;
-//	}
+	private static double getNumberOfHoles(int[][] futureFields) {
+		return num_holes;
+	}
+
 	
 	public static double getWellSums(int[][] futureFields) {
 		int[][] fieldCopy = new int[21][10];
@@ -139,10 +201,52 @@ public class Heuristic {
 		}
 	}
 
-	public static double getRoughness(int[][] futureFields) {
 
+	private static int[] getHeights(int[][] futureFields) {
+		return colHeights;
 	}
 
+	public static int getRoughness(int[][] futureFields) {
+		int[] heights = getHeights(futureFields);
+		int roughness = 0;
+
+		for (int j = 1; j < 10; j++) {
+			roughness += Math.abs(heights[j] - heights[j-1]);
+		}
+		
+		return roughness;
+	}
+
+	public static int getAggregateHeight(int[][] futureFields) {
+		int[] heights = getHeights(futureFields);
+		int aggregateHeight = 0;
+
+		for (int j = 0; j < 10; j++) {
+			aggregateHeight += heights[j];
+		}
+		
+		return aggregateHeight;
+	}
+
+	// public static int getLowestPlayableRow(int[][] futureFields) {
+
+	// }
+
+
+	public static int getBlockades(int[][] futureFields) {
+		int[] heights = getHeights(futureFields);
+		int blockades = 0;
+
+		for (int j = 0; j < 10; j++) {
+			for (int i = heights[j]; i > 0; i--) {
+				if (futureFields[i][j] != 0 && futureFields[i - 1][j] == 0) {
+					blockades += 1;
+				}
+			}
+		}
+
+		return blockades;
+	}
 
 
 	// gonna to decide the weights for each feature and set them as constant values
