@@ -20,22 +20,24 @@ public class Heuristic {
 
 	/* heuristic function, given a state and one (potential) move, 
 	return the weighted heurtisticValue combining each feature */
-	public static double heuristicValue(State s, int moveIndex) {
+	public static double heuristicValue(State s, int moveIndex) {		
 		int[] move = s.legalMoves()[moveIndex];
 		int[][] futureFields = s.getFutureFieldForMove(move);
 
-		double eliminatedRows = getRowsClearedForMove(move);
-		double landingHeight = getLandingHeight();
+		calculateHeights(futureFields);
+
+		double eliminatedRows = s.getRowsClearedForMove(move);
+		double landingHeight = 0;
 		double rowsTransition = getRowsTransition(futureFields);
 		double columnsTransition = getColumnsTransition(futureFields);
 		double numHoles = getNumberOfHoles(futureFields);
 		double wellsum = getWellSums(futureFields);
 		double roughness = getRoughness(futureFields);
 		double aggregateHeight = getAggregateHeight(futureFields);
-		double maxHoleHeight;
-		double maxColumnHeight;
-		double columnsWithHoles;
-		double rowsWithHoles;
+		double maxHoleHeight = 0;
+		double maxColumnHeight = 0;
+		double columnsWithHoles = 0;
+		double rowsWithHoles = 0;
 		double lowestPlayableRow = getLowestPlayableRow(futureFields);
 		double maxPitDepeth = getMaximumPitDepth(futureFields);
 		double slope = getSlope(futureFields);
@@ -61,10 +63,12 @@ public class Heuristic {
 		value += concavity * WEIGHT_CONCAVITY;
 		value += blockades * WEIGHT_BLOCKADES;
 
+		System.out.println(value);
+
 		return value;
 	}
 
-	static int[] heights;
+	static int[] heights = new int[10];
 
 	public static void traverse(int[][] fieldCopy, int i, int j) {
 		if (fieldCopy[i][j] == 0) {
@@ -95,7 +99,7 @@ public class Heuristic {
 	private static void calculateHeights(int[][] futureFields) {
 		for (int j = 0; j < 10; j++) {
 			boolean flag = true;
-			for (int i = 20; j >= 0 && flag; i--) {
+			for (int i = 20; i >= 0 && flag; i--) {
 				if (futureFields[i][j] != 0) {
 					heights[j] = i + 1;
 					flag = false;
@@ -109,7 +113,7 @@ public class Heuristic {
 	}
 
 	private static double getLandingHeight() {
-
+		return 0;
 	}
 
 	private static double getMaximumPitDepth(int[][] futureFields) {
@@ -128,7 +132,7 @@ public class Heuristic {
 
 	private static double getRowsTransition(int[][] futureFields) {
 		int rowsTransition = 0;
-		for (int i = 21; i >= 0; i--) {
+		for (int i = 20; i >= 0; i--) {
 			for (int j = 1; j < 10; j++) {
 				if (futureFields[i][j] != futureFields[i][j-1]) {
 					rowsTransition++;
@@ -141,7 +145,7 @@ public class Heuristic {
 	private static double getColumnsTransition(int[][] futureFields) {
 		int columnsTransition = 0;
 		for (int j = 0; j < 10; j++) {
-			for (int i = 21; i > 0; i--) {
+			for (int i = 20; i > 0; i--) {
 				if (futureFields[i][j] != futureFields[i-1][j]) {
 					columnsTransition++;
 				}
