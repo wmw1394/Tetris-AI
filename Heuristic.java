@@ -3,9 +3,6 @@ public class Heuristic {
 	return the weighted heurtisticValue combining each feature */
 
 	public static double heuristicValue(State s, int moveIndex) {
-		int[][] futureFields = s.getFutureField(move);
-
-		eliminatedRows = s.getRowsClearedForMove(move);
 		int[] move = s.legalMoves()[moveIndex];
 		return 0;		
 	}

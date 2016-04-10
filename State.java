@@ -6,15 +6,19 @@ public class State {
 	public static final int N_PIECES = 7;
 
 	public boolean lost = false;
+	public boolean virtualLost = false;
 	
 	public TLabel label;
 	
 	//current turn
 	private int turn = 0;
 	private int cleared = 0;
+	private int[] virtualMove;
+	private int virtualRowsCleared = 0;
 	
 	//each square in the grid - int means empty - other values mean the turn it was placed
 	private int[][] field = new int[ROWS][COLS];
+	private int[][] futureField = new int[ROWS][COLS];
 	
 	//top row+1 of each column
 	//0 means empty
@@ -31,7 +35,7 @@ public class State {
 	public static final int SLOT = 1;
 	
 	//possible orientations for a given piece type
-	//square, long, L, L flipped vertically, rotate 凸 clockwise 90 degress, z flipped vertically, z
+	//square, long, L, L flipped vertically, rotate 鍑� clockwise 90 degress, z flipped vertically, z
 	protected static int[] pOrients = {1,2,4,4,4,2,2};
 	
 	//the next several arrays define the piece vocabulary in detail
@@ -240,6 +244,111 @@ public class State {
 
 		return true;
 	}
+	
+	private void virtualRun(int[] move) {
+		virtualLost = false;
+		int[][] futureField  = new int[ROWS][COLS];
+		
+		//back up field
+		for(int i = 0; i < ROWS; i++) {
+			for(int j = 0; j < COLS; j++) {
+				futureField[i][j] = field[i][j];
+			}
+		}
+		
+		int slot = virtualMove[SLOT];
+		int orient = virtualMove[ORIENT];		
+		
+		//height if the first column makes contact
+		int height = top[slot]-pBottom[nextPiece][orient][0];
+		//for each column beyond the first in the piece
+		for(int c = 1; c < pWidth[nextPiece][orient];c++) {
+			height = Math.max(height,top[slot+c]-pBottom[nextPiece][orient][c]);
+		}
+		
+		//check if game ended
+		if(height+pHeight[nextPiece][orient] >= ROWS) {
+			//mark to lost
+			virtualLost = true;
+			return;
+		}
+		
+		//for each column in the piece - fill in the appropriate blocks
+		for(int i = 0; i < pWidth[nextPiece][orient]; i++) {			
+			//from bottom to top of brick
+			for(int h = height+pBottom[nextPiece][orient][i]; h < height+pTop[nextPiece][orient][i]; h++) {
+				futureField[h][i+slot] = turn+1;
+			}
+		}
+		
+		int[] virtualTop = new int[COLS];
+		System.arraycopy(top, 0, virtualTop, 0, top.length);
+		//adjust top
+		for(int c = 0; c < pWidth[nextPiece][orient]; c++) {
+			virtualTop[slot+c]=height+pTop[nextPiece][orient][c];
+		}
+		
+		virtualRowsCleared = 0;
+		
+		//check for full rows - starting at the top
+		for(int r = height+pHeight[nextPiece][orient]-1; r >= height; r--) {
+			//check all columns in the row
+			boolean full = true;
+			for(int c = 0; c < COLS; c++) {
+				if(futureField[r][c] == 0) {
+					full = false;
+					break;
+				}
+			}
+			//if the row was full - remove it and slide above stuff down
+			if(full) {
+				virtualRowsCleared++;
+				//for each column
+				for(int c = 0; c < COLS; c++) {
+					//slide down all bricks
+					for(int i = r; i < virtualTop[c]; i++) {
+						futureField[i][c] = futureField[i+1][c];
+					}
+					//lower the top
+					virtualTop[c]--;
+					while(virtualTop[c]>=1 && futureField[virtualTop[c]-1][c]==0)	virtualTop[c]--;
+				}
+			}
+	}
+		//for testing purpose
+//		for(int i = 0; i < ROWS; i++) {
+//			for(int j = 0; j < COLS; j++) {
+//				System.out.print(futureField[i][j]);
+//			}
+//			System.out.println();
+//		}
+//		System.out.println();
+	}
+	
+	public boolean getFutureLoss(int[] move) {
+		if(virtualMove != move) {
+			virtualMove = move;
+			virtualRun(move);
+		} 
+			return virtualLost;
+	}
+	
+	public int[][] getFutureFieldForMove(int[] move) {
+		if(virtualMove != move) {
+			virtualMove = move;
+			virtualRun(move);
+		} 
+		return futureField;
+	}
+	
+	public int getRowsClearedForMove(int[] move) {
+		if(virtualMove != move) {
+			virtualMove = move;
+			virtualRun(move);
+		} 
+		return virtualRowsCleared;
+	}
+
 	
 	public void draw() {
 		label.clear();
