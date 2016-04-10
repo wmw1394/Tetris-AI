@@ -16,20 +16,6 @@ public class PlayerSkeleton {
 		this(Integer.MAX_VALUE, weights);
 	}
 
-	//implement this function to have a working system
-	private int pickMove(State s, int[][] legalMoves) {
-		double maxHValue = Double.NEGATIVE_INFINITY;
-		int moveWithMaxHValue = 0;
-		for (int i = 0; i < legalMoves.length; i++) {
-			double hvalue = Heuristic.heuristicValue(s, i);
-			if (hvalue > maxHValue) {
-				maxHValue = hvalue;
-				moveWithMaxHValue = i;
-			}
-		}
-		return moveWithMaxHValue;
-	}
-
 	public void play() {
 		new TFrame(s);
 		int pieceCount = 0;
@@ -46,15 +32,27 @@ public class PlayerSkeleton {
 		System.out.println("You have completed " + s.getRowsCleared() + " rows.");
 	}
 
+	//implement this function to have a working system
+	private int pickMove(State s, int[][] legalMoves) {
+		double maxHValue = Double.NEGATIVE_INFINITY;
+		int moveWithMaxHValue = 0;
+		for (int i = 0; i < legalMoves.length; i++) {
+			double hvalue = Heuristic.heuristicValue(s, i);
+			if (hvalue > maxHValue) {
+				maxHValue = hvalue;
+				moveWithMaxHValue = i;
+			}
+		}
+		return moveWithMaxHValue;
+	}
+
 	public int getScore() {
 		return s.getRowsCleared();
 	}
-
-	public static final int FEATURE_COUNT = 10;
 	
 	public static void main(String[] args) {
 		ArrayList<Double> weights = new ArrayList<Double>();
-		for (int i = 0; i < FEATURE_COUNT; i++) {
+		for (int i = 0; i < Constant.FEATURE_COUNT; i++) {
 			weights.add(1.0);
 		}
 		PlayerSkeleton p = new PlayerSkeleton(weights);

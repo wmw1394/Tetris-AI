@@ -2,18 +2,16 @@ import java.util.*;
 
 public class HeuristicTuner {
 
-	public static final int GENERATION_COUNT = 1000;
-	public static final int POPULATION_SIZE = 1000;
-	public static final int TOP_K = 16;
-	public static final int FEATURE_COUNT = 8;
-	public static final int PIECE_LIMIT = 1000;
-
+	private static final int GENERATION_COUNT = 1000;
+	private static final int POPULATION_SIZE = 1000;
+	private static final int TOP_K = 16;
+	private static final int PIECE_LIMIT = 1000;
 	private static final long RANDOM_SEED = 7777777L;
 	private static final Random random = new Random(RANDOM_SEED);
 
 	public static ArrayList<Double> generateRandomWeight() {
 		ArrayList<Double> weights = new ArrayList<Double>();
-		for (int i = 0; i < FEATURE_COUNT; i++) {
+		for (int i = 0; i < Constant.FEATURE_COUNT; i++) {
 			weights.add(random.nextDouble());
 		}
 		return weights;
