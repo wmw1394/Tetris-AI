@@ -1,3 +1,5 @@
+import java.util.stream.IntStream;
+
 public class Heuristic {
 
 	private static final double WEIGHT_ELIMATED_ROWS = 1;
@@ -17,6 +19,10 @@ public class Heuristic {
 	private static final double WEIGHT_SLOPE = 1;
 	private static final double WEIGHT_CONCAVITY = 1;
 	private static final double WEIGHT_BLOCKADES = 1;
+	private static double maxHoleHeight;
+	private static double maxColumnHeight;
+	private static double columnsWithHoles;
+	private static double rowsWithHoles;
 
 	/* heuristic function, given a state and one (potential) move, 
 	return the weighted heurtisticValue combining each feature */
@@ -26,8 +32,11 @@ public class Heuristic {
 
 		calculateHeights(futureFields);
 
+		int rowsCleared = s.getRowsClearedForMove(move);
+		int firstCol = move[1];
+		int length = State.pWidth[s.getNextPiece()][move[0]];
+		double landingHeight = (int) getLandingHeight(futureFields, firstCol, length, rowsCleared);
 		double eliminatedRows = s.getRowsClearedForMove(move);
-		double landingHeight = 0;
 		double rowsTransition = getRowsTransition(futureFields);
 		double columnsTransition = getColumnsTransition(futureFields);
 		double numHoles = getNumberOfHoles(futureFields);
@@ -112,8 +121,18 @@ public class Heuristic {
 		return heights;
 	}
 
-	private static double getLandingHeight() {
-		return 0;
+	private static double getLandingHeight(int[][] futureFields, int firstCol, int length, int rowsCleared) {
+		int height = 0;
+		for(int i = firstCol; i < firstCol + length; i++) {
+			if(height < heights[i]) {
+				height = heights[i];
+				System.out.println("column_height:"+heights[i]);
+				System.out.println("i:"+i);
+
+			}
+		}
+		height -= rowsCleared;
+		return height;
 	}
 
 	private static double getMaximumPitDepth(int[][] futureFields) {
@@ -192,6 +211,46 @@ public class Heuristic {
 		}
 		return num_holes;
 	}
+	
+	//just use search holes
+		private static void searchHoles(int[][] futureFields) {
+			 int num_holes = 0;
+			 maxHoleHeight = 0;
+			 maxColumnHeight = 0;
+			 columnsWithHoles = 0;
+			 rowsWithHoles = 0;
+			 int[] colWithHoles = new int[10];
+			 int[] rowWithHoles = new int[21];
+
+			 for (int j = 0; j < 10; j++) {
+					boolean flag = false;
+					for (int i = 20; i >= 1; i--) {
+						if (futureFields[i][j] != 0) {
+							if (maxColumnHeight < i+1) {
+								maxColumnHeight = i+1;
+							}
+							if (!flag) {
+								System.out.println("max_column_height:"+i);
+								flag = true;
+							}
+						}
+
+						if (flag == true) {
+							if (futureFields[i][j] == 0) {
+								if (maxHoleHeight < i) {
+									maxHoleHeight = i;
+								}
+								num_holes++;
+								colWithHoles[j] = 1;
+								rowWithHoles[i] = 1;
+							}
+						}
+					}
+				}
+			 rowsWithHoles = IntStream.of(rowWithHoles).sum();
+				columnsWithHoles = IntStream.of(colWithHoles).sum();
+		}
+
 
 	public static double getWellSums(int[][] futureFields) {
 		int[][] fieldCopy = new int[21][10];

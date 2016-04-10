@@ -247,7 +247,7 @@ public class State {
 	
 	private void virtualRun(int[] move) {
 		virtualLost = false;
-		int[][] futureField  = new int[ROWS][COLS];
+		futureField  = new int[ROWS][COLS];
 		
 		//back up field
 		for(int i = 0; i < ROWS; i++) {
@@ -316,13 +316,13 @@ public class State {
 			}
 	}
 		//for testing purpose
-//		for(int i = 0; i < ROWS; i++) {
-//			for(int j = 0; j < COLS; j++) {
-//				System.out.print(futureField[i][j]);
-//			}
-//			System.out.println();
-//		}
-//		System.out.println();
+		for(int i = 0; i < ROWS; i++) {
+			for(int j = 0; j < COLS; j++) {
+				System.out.print(futureField[i][j]);
+			}
+			System.out.println();
+		}
+		System.out.println();
 	}
 	
 	public boolean getFutureLoss(int[] move) {

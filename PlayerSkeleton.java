@@ -21,7 +21,6 @@ public class PlayerSkeleton {
 		double maxHValue = 0;
 		int moveWithMaxHValue = 0;
 		for (int i = 0; i < legalMoves.length; i++) {
-			int[] move = legalMoves[i];
 			double hvalue = Heuristic.heuristicValue(s, i);
 			if (hvalue > maxHValue) {
 				maxHValue = hvalue;
