@@ -12,8 +12,13 @@ public class PlayerSkeleton {
 		s = new State();
 	}
 
-	public PlayerSkeleton(ArrayList<Double> weights) {
-		this(Integer.MAX_VALUE, weights);
+	public static PlayerSkeleton LimitlessPlayerSkeleton() {
+		int pieceLimit = Integer.MAX_VALUE;
+		ArrayList<Double> weights = new ArrayList<Double>();
+		for (int i = 0; i < Constant.FEATURE_COUNT; i++) {
+			weights.add(1.0);
+		}		
+		return new PlayerSkeleton(pieceLimit, weights);
 	}
 
 	public void play() {
@@ -51,11 +56,7 @@ public class PlayerSkeleton {
 	}
 	
 	public static void main(String[] args) {
-		ArrayList<Double> weights = new ArrayList<Double>();
-		for (int i = 0; i < Constant.FEATURE_COUNT; i++) {
-			weights.add(1.0);
-		}
-		PlayerSkeleton p = new PlayerSkeleton(weights);
+		PlayerSkeleton p = PlayerSkeleton.LimitlessPlayerSkeleton();
 		p.play();
 	}
 }
