@@ -46,6 +46,7 @@ public class HeuristicTuner {
 			for (int i = 0; i < POPULATION_SIZE; i++) {
 				ArrayList<Double> weights = population.get(i);
 				PlayerSkeleton player = new PlayerSkeleton(pieceLimitForGeneration, weights);
+				player.frameless = true;
 				player.play();
 				int score = player.getScore();
 				fitnessScores.add(score);

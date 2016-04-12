@@ -5,14 +5,16 @@ public class PlayerSkeleton {
 	private int pieceLimit;
 	private ArrayList<Double> weights;
 	private State s;
+	public boolean frameless;
 
 	public PlayerSkeleton(int pieceLimit, ArrayList<Double> weights) {
 		this.pieceLimit = pieceLimit;
 		this.weights = weights;
 		s = new State();
+		frameless = false;
 	}
 
-	public static PlayerSkeleton LimitlessPlayerSkeleton() {
+	public static PlayerSkeleton limitlessPlayerSkeleton() {
 		int pieceLimit = Integer.MAX_VALUE;
 		ArrayList<Double> weights = new ArrayList<Double>();
 		for (int i = 0; i < Constant.FEATURE_COUNT; i++) {
@@ -22,16 +24,20 @@ public class PlayerSkeleton {
 	}
 
 	public void play() {
-		new TFrame(s);
+		if (!frameless) {
+			new TFrame(s);
+		}
 		int pieceCount = 0;
 		while (!s.hasLost() && pieceCount < pieceLimit) {
 			s.makeMove(pickMove(s, s.legalMoves()));
-			s.draw();
-			s.drawNext(0, 0);
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			if (!frameless) {	
+				s.draw();
+				s.drawNext(0, 0);
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		System.out.println("You have completed " + s.getRowsCleared() + " rows.");
@@ -56,7 +62,8 @@ public class PlayerSkeleton {
 	}
 	
 	public static void main(String[] args) {
-		PlayerSkeleton p = PlayerSkeleton.LimitlessPlayerSkeleton();
+		PlayerSkeleton p = PlayerSkeleton.limitlessPlayerSkeleton();
+		p.frameless = true;
 		p.play();
 	}
 }
