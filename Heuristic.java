@@ -3,24 +3,24 @@ import java.util.stream.*;
 
 public class Heuristic {
 
-	private static final double WEIGHT_ELIMATED_ROWS = 8;
-	private static final double WEIGHT_LANDING_HEIGHT = -1;
+	private static final double WEIGHT_ELIMATED_ROWS = 2.4;
+	private static final double WEIGHT_LANDING_HEIGHT = -3.71;
 	private static final double WEIGHT_ROWS_TRANSITION = 0;
 	private static final double WEIGHT_COLUMN_TRANSITION = 0;
-	private static final double WEIGHT_NUMBER_HOLES = -2;
+	private static final double WEIGHT_NUMBER_HOLES = -4.79;
 	private static final double WEIGHT_WELL_SUM = 0;
-	private static final double WEIGHT_ROUGHNESS = 1;
-	private static final double WEIGHT_AGGREGATE_HEIGHT = -1;
-	private static final double WEIGHT_MAX_HOLE_HEIGHT = -3;
-	private static final double WEIGHT_MAX_COLUMN_HEIGHT = -1;
-	private static final double WEIGHT_COLUMNS_WITH_HOLES = -1;
-	private static final double WEIGHT_ROWS_WITH_HOLES = -1;
+	private static final double WEIGHT_ROUGHNESS = -1.7;
+	private static final double WEIGHT_AGGREGATE_HEIGHT = 0;
+	private static final double WEIGHT_MAX_HOLE_HEIGHT = 0;
+	private static final double WEIGHT_MAX_COLUMN_HEIGHT = -1.3;
+	private static final double WEIGHT_COLUMNS_WITH_HOLES = 0;
+	private static final double WEIGHT_ROWS_WITH_HOLES = 0;
 	private static final double WEIGHT_LOWEST_PLAYABLE_ROW = 0;
-	private static final double WEIGHT_MAX_PIT_DEPTH = -1;
-	private static final double WEIGHT_SLOPE = 1;
-	private static final double WEIGHT_CONCAVITY = 1;
-	private static final double WEIGHT_BLOCKADES = -3;
-	
+	private static final double WEIGHT_MAX_PIT_DEPTH = 0;
+	private static final double WEIGHT_SLOPE = 0;
+	private static final double WEIGHT_CONCAVITY = 0;
+	private static final double WEIGHT_BLOCKADES = -1.87;
+
 	private static double maxHoleHeight;
 	private static double maxColumnHeight;
 	private static double columnsWithHoles;
@@ -56,23 +56,28 @@ public class Heuristic {
 		double blockades = getBlockades(futureFields);
 
 		double value = 0;
-		value += eliminatedRows * WEIGHT_ELIMATED_ROWS;
-		value += landingHeight * WEIGHT_LANDING_HEIGHT;
-		value += rowsTransition * WEIGHT_ROWS_TRANSITION;
-		value += columnsTransition * WEIGHT_COLUMN_TRANSITION;
-		value += numHoles * WEIGHT_NUMBER_HOLES;
-		value += wellsum * WEIGHT_WELL_SUM;
-		value += roughness * WEIGHT_ROUGHNESS;
-		value += aggregateHeight * WEIGHT_AGGREGATE_HEIGHT;
-		value += maxHoleHeight * WEIGHT_MAX_HOLE_HEIGHT;
-		value += maxColumnHeight * WEIGHT_MAX_COLUMN_HEIGHT;
-		value += columnsWithHoles * WEIGHT_COLUMNS_WITH_HOLES;
-		value += rowsWithHoles * WEIGHT_ROWS_WITH_HOLES;
-		value += lowestPlayableRow * WEIGHT_LOWEST_PLAYABLE_ROW;
-		value += maxPitDepeth * WEIGHT_MAX_PIT_DEPTH;
-		value += slope * WEIGHT_SLOPE;
-		value += concavity * WEIGHT_CONCAVITY;
-		value += blockades * WEIGHT_BLOCKADES;
+
+		if (s.getFutureLoss(move)) {
+			value = Double.NEGATIVE_INFINITY;
+		} else {
+			value += eliminatedRows * WEIGHT_ELIMATED_ROWS;
+			value += landingHeight * WEIGHT_LANDING_HEIGHT;
+			value += rowsTransition * WEIGHT_ROWS_TRANSITION;
+			value += columnsTransition * WEIGHT_COLUMN_TRANSITION;
+			value += numHoles * WEIGHT_NUMBER_HOLES;
+			value += wellsum * WEIGHT_WELL_SUM;
+			value += roughness * WEIGHT_ROUGHNESS;
+			value += aggregateHeight * WEIGHT_AGGREGATE_HEIGHT;
+			value += maxHoleHeight * WEIGHT_MAX_HOLE_HEIGHT;
+			value += maxColumnHeight * WEIGHT_MAX_COLUMN_HEIGHT;
+			value += columnsWithHoles * WEIGHT_COLUMNS_WITH_HOLES;
+			value += rowsWithHoles * WEIGHT_ROWS_WITH_HOLES;
+			value += lowestPlayableRow * WEIGHT_LOWEST_PLAYABLE_ROW;
+			value += maxPitDepeth * WEIGHT_MAX_PIT_DEPTH;
+			value += slope * WEIGHT_SLOPE;
+			value += concavity * WEIGHT_CONCAVITY;
+			value += blockades * WEIGHT_BLOCKADES;
+		}
 
 		return value;
 	}
