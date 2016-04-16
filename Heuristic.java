@@ -3,28 +3,54 @@ import java.util.stream.*;
 
 public class Heuristic {
 
-	private static final double WEIGHT_ELIMATED_ROWS = 2.4;
-	private static final double WEIGHT_LANDING_HEIGHT = -3.71;
-	private static final double WEIGHT_ROWS_TRANSITION = 0;
-	private static final double WEIGHT_COLUMN_TRANSITION = 0;
-	private static final double WEIGHT_NUMBER_HOLES = -4.79;
-	private static final double WEIGHT_WELL_SUM = 0;
-	private static final double WEIGHT_ROUGHNESS = -1.7;
-	private static final double WEIGHT_AGGREGATE_HEIGHT = 0;
-	private static final double WEIGHT_MAX_HOLE_HEIGHT = 0;
-	private static final double WEIGHT_MAX_COLUMN_HEIGHT = -1.3;
-	private static final double WEIGHT_COLUMNS_WITH_HOLES = 0;
-	private static final double WEIGHT_ROWS_WITH_HOLES = 0;
-	private static final double WEIGHT_LOWEST_PLAYABLE_ROW = 0;
-	private static final double WEIGHT_MAX_PIT_DEPTH = 0;
-	private static final double WEIGHT_SLOPE = 0;
-	private static final double WEIGHT_CONCAVITY = 0;
-	private static final double WEIGHT_BLOCKADES = -1.87;
+	private static double WEIGHT_ELIMATED_ROWS = 2.4;
+	private static double WEIGHT_LANDING_HEIGHT = -3.71;
+	private static double WEIGHT_ROWS_TRANSITION = 0;
+	private static double WEIGHT_COLUMN_TRANSITION = 0;
+	private static double WEIGHT_NUMBER_HOLES = -4.79;
+	private static double WEIGHT_WELL_SUM = 0;
+	private static double WEIGHT_ROUGHNESS = -1.7;
+	private static double WEIGHT_AGGREGATE_HEIGHT = 0;
+	private static double WEIGHT_MAX_HOLE_HEIGHT = 0;
+	private static double WEIGHT_MAX_COLUMN_HEIGHT = -1.3;
+	private static double WEIGHT_COLUMNS_WITH_HOLES = 0;
+	private static double WEIGHT_ROWS_WITH_HOLES = 0;
+	private static double WEIGHT_LOWEST_PLAYABLE_ROW = 0;
+	private static double WEIGHT_MAX_PIT_DEPTH = 0;
+	private static double WEIGHT_SLOPE = 0;
+	private static double WEIGHT_CONCAVITY = 0;
+	private static double WEIGHT_BLOCKADES = -1.87;
 
 	private static double maxHoleHeight;
 	private static double maxColumnHeight;
 	private static double columnsWithHoles;
 	private static double rowsWithHoles;
+
+	public static void assignWeights(ArrayList<Double> weights) {
+		WEIGHT_ELIMATED_ROWS = weights.get(0);
+		WEIGHT_LANDING_HEIGHT = weights.get(1);
+		// WEIGHT_ROWS_TRANSITION = weights.get(2);
+		// WEIGHT_COLUMN_TRANSITION = weights.get(3);
+		WEIGHT_NUMBER_HOLES = weights.get(4);
+		// WEIGHT_WELL_SUM = weights.get(5);
+		WEIGHT_ROUGHNESS = weights.get(6);
+		// WEIGHT_AGGREGATE_HEIGHT = weights.get(7);
+		// WEIGHT_MAX_HOLE_HEIGHT = weights.get(8);
+		WEIGHT_MAX_COLUMN_HEIGHT = weights.get(9);
+		// WEIGHT_COLUMNS_WITH_HOLES = weights.get(10);
+		// WEIGHT_ROWS_WITH_HOLES = weights.get(11);
+		// WEIGHT_LOWEST_PLAYABLE_ROW = weights.get(12);
+		// WEIGHT_MAX_PIT_DEPTH = weights.get(13);
+		// WEIGHT_SLOPE = weights.get(14);
+		// WEIGHT_CONCAVITY = weights.get(15);
+		WEIGHT_BLOCKADES = weights.get(16);
+	}
+
+	public static void printWeights() {
+		String s = String.format("rows: %f  heigth: %f  holes: %f  roughness: %f  max_column_height: %f  blockades: %f",
+			WEIGHT_ELIMATED_ROWS, WEIGHT_LANDING_HEIGHT, WEIGHT_NUMBER_HOLES, WEIGHT_ROUGHNESS, WEIGHT_MAX_COLUMN_HEIGHT, WEIGHT_BLOCKADES);
+		System.out.println(s);
+	}
 
 	/* heuristic function, given a state and one (potential) move, 
 	return the weighted heurtisticValue combining each feature */

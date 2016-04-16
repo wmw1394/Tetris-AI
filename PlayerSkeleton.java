@@ -24,6 +24,7 @@ public class PlayerSkeleton {
 	}
 
 	public void play() {
+		Heuristic.assignWeights(weights);
 		if (!frameless) {
 			new TFrame(s);
 		}
@@ -40,7 +41,7 @@ public class PlayerSkeleton {
 				}
 			}
 		}
-		System.out.println("You have completed " + s.getRowsCleared() + " rows.");
+		// System.out.println("You have completed " + s.getRowsCleared() + " rows.");
 	}
 
 	//implement this function to have a working system

@@ -3,18 +3,37 @@ import java.util.*;
 public class HeuristicTuner {
 
 	private static final int GENERATION_COUNT = 1000;
-	private static final int POPULATION_SIZE = 1000;
+	private static final int POPULATION_SIZE = 100;
 	private static final int TOP_K = 16;
 	private static final int PIECE_LIMIT = 1000;
-	private static final long RANDOM_SEED = 7777777L;
-	private static final Random random = new Random(RANDOM_SEED);
+	private static final int MAX_RANDOM_WEIGHT = 10;
 
-	public static ArrayList<Double> generateRandomWeight() {
+	private static int performanceBarForGeneration = 100;
+	private static int pieceLimitForGeneration = PIECE_LIMIT;
+
+	public static double generateRandomWeight() {
+		double randomWeight = MAX_RANDOM_WEIGHT * Math.random();
+		// can be positive or negative weight
+		if (Math.random() < 0.5) {
+			randomWeight = -randomWeight;
+		}
+		return randomWeight;
+	}
+
+	public static ArrayList<Double> generateRandomWeights() {
 		ArrayList<Double> weights = new ArrayList<Double>();
 		for (int i = 0; i < Constant.FEATURE_COUNT; i++) {
-			weights.add(random.nextDouble());
+			weights.add(generateRandomWeight());
 		}
 		return weights;
+	}
+
+	public static int computeFitnessScore(ArrayList<Double> weights) {
+		PlayerSkeleton player = new PlayerSkeleton(pieceLimitForGeneration, weights);
+		player.frameless = true;
+		player.play();
+		int score = player.getScore();
+		return score;
 	}
 
 	public static ArrayList<ArrayList<Double>> generateNextPopulation(ArrayList<ArrayList<Double>> topWeightsFromLastIteration) {
@@ -24,20 +43,26 @@ public class HeuristicTuner {
 		return newPopulation;
 	}
 
+
 	public static void main(String[] args) {
 		
 		ArrayList<ArrayList<Double>> population = new ArrayList<ArrayList<Double>>();
 		
 		// generate first population
 		for (int i = 0; i < POPULATION_SIZE; i++) {
-			ArrayList<Double> randomWegiths = generateRandomWeight();
-			population.add(randomWegiths);
+			// generate random wegiths whose performance is better than the performance bar for current generation
+			while (true) {
+				ArrayList<Double> randomWegiths = generateRandomWeights();
+				int score = computeFitnessScore(randomWegiths);
+				if (score > performanceBarForGeneration) {
+					System.out.println(score);
+					population.add(randomWegiths);
+				}
+			}
 		}
 
 		// evoluate by generation
-		for (int generation = 0; generation < GENERATION_COUNT; generation++) {
-
-			int pieceLimitForGeneration = (generation + 1) * PIECE_LIMIT;
+		for (int generation = 0; generation < 0; generation++) {
 
 			// compute the fitness scores
 			ArrayList<Integer> fitnessScores = new ArrayList<Integer>();
@@ -45,10 +70,7 @@ public class HeuristicTuner {
 			int maxScoreWeightIndex = 0;
 			for (int i = 0; i < POPULATION_SIZE; i++) {
 				ArrayList<Double> weights = population.get(i);
-				PlayerSkeleton player = new PlayerSkeleton(pieceLimitForGeneration, weights);
-				player.frameless = true;
-				player.play();
-				int score = player.getScore();
+				int score = computeFitnessScore(weights);
 				fitnessScores.add(score);
 				if (score > maxScore) {
 					maxScore = score;
@@ -77,6 +99,8 @@ public class HeuristicTuner {
 				// TODO: output the best weight in the last generation
 
 			}
+
+			pieceLimitForGeneration += PIECE_LIMIT;
 		}
 	}
 }
